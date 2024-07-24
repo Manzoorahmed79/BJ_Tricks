@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.ico" type="image/x-icon">
+    
+    <!--=============== REMIX ICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="assets/css/styles.css">
+
+    <title>NANO C-k - Portfolio</title>
+
+    <style>
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.85); /* Increased transparency */
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Dark shadow effect */
+            z-index: 2;
+            border-radius: 10px;
+            width: 400px;
+        }
+
+        .popup h3 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .popup p {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .popup input,
+        .popup select,
+        .popup button {
+            width: calc(100% - 20px);
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .popup button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+
+        .popup button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .popup .cancel {
+            background-color: #dc3545;
+        }
+
+        .popup .cancel:hover {
+            background-color: #c82333;
+        }
+
+        .profile__cover {
+            width: 100%;
+            height: 250px; /* Adjust the height as needed */
+            background-image: url('assets/img/bj.png'); /* Path to your cover image */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .profile__perfil {
+            position: absolute;
+            bottom: -50px; /* Adjust this value to control the overlap */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px; /* Adjust the size as needed */
+            height: 150px; /* Adjust the size as needed */
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #fff; /* Optional: To give a white border around the profile picture */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Optional: To give a shadow effect */
+            background: #fff; /* White background to cover the part of the cover image */
+        }
+
+        .profile__perfil img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile__data {
+            text-align: center;
+            padding-top: 30px; /* Adjust this value to control the spacing */
+        }
+
+        .profile__name {
+            margin-top: 10px; /* Adjust this value to control the spacing */
+        }
+    </style>
+
+    <script>
+        function openOrderForm(product, price) {
+            document.getElementById('product-name').innerText = product;
+            document.getElementById('product-price').innerText = price;
+            document.getElementById('order-form').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closeOrderForm() {
+            document.getElementById('order-form').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function validateForm() {
+            var phone = document.getElementById('phone').value;
+            var email = document.getElementById('email').value;
+            var name = document.getElementById('name').value;
+            var country = document.getElementById('country').value;
+
+            var submitButton = document.getElementById('submit-button');
+
+            if (phone && email && name && country) {
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+
+        function sendOrder() {
+            var productName = document.getElementById('product-name').innerText;
+            var price = document.getElementById('product-price').innerText;
+            var phone = document.getElementById('phone').value;
+            var email = document.getElementById('email').value;
+            var name = document.getElementById('name').value;
+            var country = document.getElementById('country').value;
+
+            var message = "Product: " + productName + "\nPrice: " + price + "\nPhone: " + phone + "\nEmail: " + email + "\nName: " + name + "\nCountry: " + country;
+            var encodedMessage = encodeURIComponent(message);
+
+            var url = "https://api.whatsapp.com/send?phone=+923066415656&text=" + encodedMessage;
+            window.open(url, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var buyButtons = document.querySelectorAll('.projects__button-buy');
+            buyButtons.forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var product = this.getAttribute('data-product');
+                    var price = this.getAttribute('data-price');
+                    openOrderForm(product, price);
+                });
+            });
+
+            var filterButtons = document.querySelectorAll('.filters__button');
+            var projectsSection = document.getElementById('projects');
+            var skillsSection = document.getElementById('skills');
+
+            filterButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(function(btn) {
+                        btn.classList.remove('filter-tab-active');
+                    });
+                    this.classList.add('filter-tab-active');
+                    
+                    if (this.getAttribute('data-target') === '#skills') {
+                        projectsSection.style.display = 'none';
+                        skillsSection.style.display = 'block';
+                    } else {
+                        projectsSection.style.display = 'block';
+                        skillsSection.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <!--=============== HEADER ===============-->
+    <header class="profile container">
+        <!-- Theme button -->
+        <i class="ri-moon-line change-theme" id="theme-button"></i>
+
+        <div class="profile__container grid">
+            <div class="profile__cover">
+                <div class="profile__perfil">
+                    <img src="assets/img/perfil.png" alt="Profile Picture">
+                </div>
+            </div>
+            <div class="profile__data">
+                <h2 class="profile__name">Manzoor Ahmed</h2>
+                <h3 class="profile__profession">Full Stack Developer</h3>
+
+                <ul class="profile__social">
+                    <a href="https://t.me/BJ_Tricks" target="_blank" class="profile__social-link">
+                        <i class="ri-discord-fill"></i>
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=100049290452298" target="_blank" class="profile__social-link">
+                        <i class="ri-youtube-fill"></i>
+                    </a>
+                    <a href="https://t.me/BJ_Tricks" target="_blank" class="profile__social-link">
+                        <i class="ri-github-fill"></i>
+                    </a>
+                    <a href="https://www.instagram.com/manzoor__ahmed07?igsh=YnJlM3JnM3M3NzJo" target="_blank" class="profile__social-link">
+                        <i class="ri-linkedin-fill"></i>
+                    </a>
+                </ul>
+            </div>
+
+                        <div class="profile__info grid">
+                <div class="profile__info-group">
+                    <h3 class="profile__info-number">3</h3>
+                    <p class="profile__info-description">
+                        Years of <br> experience
+                    </p>
+                </div>
+                <div class="profile__info-group">
+                    <h3 class="profile__info-number">+3</h3>
+                    <p class="profile__info-description">
+                        Active <br> projects
+                    </p>
+                </div>
+                <div class="profile__info-group">
+                    <h3 class="profile__info-number">+15</h3>
+                    <p class="profile__info-description">Satisfied <br> customers</p>
+                </div>
+            </div>
+
+            <div class="profile__buttons">
+                <!-- <a download="" href="assets/pdf/Gianell-Cv.pdf" class="button">Download CV <i class="ri-download-line"></i></a> -->
+                <a href="mailto:manzoor76b@gmail.com" target="_blank" class="button">
+                    Contact me <i class="ri-mail-fill"></i>
+                </a>
+                <div class="profile__buttons-small">
+                    <a href="https://t.me/BJ_Tricks" target="_blank" class="button button__small button__gray">
+                        JOIN TG |BJ_Tricks|<i class="ri-discord-fill"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!--=============== MAIN ===============-->
+    <main class="main">
+        <section class="filters container">
+            <!--=============== FILTERS TABS ===============-->
+            <ul class="filters__content">
+                <button class="filters__button filter-tab-active" data-target="#projects">
+                    (Deprecated) Projects
+                </button>
+                <button class="filters__button" data-target="#skills">
+                    Skills
+                </button>
+            </ul>
+
+            <!--=============== FILTERS ===============-->
+            <div class="filters__sections">
+                <!--=============== PROJECTS ===============-->
+                <section class="projects__content grid filters__sections" id="projects">
+                    <article class="projects__card">
+                        <!-- Insert your image in a rectangular format (Ex: 600 x 400, 1000 x 800, 1200 x 1000, etc) -->
+                        <img src="assets/img/pg.png" alt="" class="projects__img">
+
+                        <div class="projects__modal">
+                            <div>
+                                <span class="projects__subtitle">Animated Login Page</span>
+                                <h3 class="projects__title">a very beautiful animated login page</h3>
+                                <a href="https://t.me/MrBaBlU0J" target="_blank" class="projects__button">
+                                    <i class="ri-link"></i>
+                                </a>
+                                <button class="projects__button-buy" data-product="Animated Login Page" data-price="$5">
+                                    Buy Now
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="projects__card">
+                        <!-- Insert your image in a rectangular format (Ex: 600 x 400, 1000 x 800, 1200 x 1000, etc) -->
+                        <img src="assets/img/pg2.png" alt="" class="projects__img">
+
+                        <div class="projects__modal">
+                            <div>
+                                <span class="projects__subtitle">Portfolio Design</span>
+                                <h3 class="projects__title">a Very Awesome Portfolio Can Create your owns This Portfolio while Like Hacker</h3>
+                                <a href="https://bj-tricks-official.vercel.app" target="_blank" class="projects__button">
+                                    <i class="ri-link"></i>
+                                </a>
+                                <button class="projects__button-buy" data-product="Portfolio Design" data-price="$30$">
+                                    Buy Now
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="projects__card">
+                        <!-- Insert your image in a rectangular format (Ex: 600 x 400, 1000 x 800, 1200 x 1000, etc) -->
+                        <img src="assets/img/pg3.png" alt="" class="projects__img">
+
+                        <div class="projects__modal">
+                            <div>
+                                <span class="projects__subtitle">Animated Portfolio Design</span>
+                                <h3 class="projects__title">This Portfolio Is Also Awesome This Is Animated Portfolio</h3>
+                                <a href="https://mr-ba-bl-u.vercel.app/" target="_blank" class="projects__button">
+                                    <i class="ri-link"></i>
+                                </a>
+                                <button class="projects__button-buy" data-product="Animated Portfolio Design" data-price="$30">
+                                    Buy Now
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <!--=============== SKILLS ===============-->
+                <section class="skills__content grid filters__sections" id="skills" style="display: none;">
+                    <article class="skills__card">
+                        <h3 class="skills__title">Frontend Development</h3>
+                        <ul>
+                            <li>HTML</li>
+                            <li>CSS</li>
+                            <li>JavaScript</li>
+                            <li>React</li>
+                            <li>Angular</li>
+                        </ul>
+                    </article>
+                    <article class="skills__card">
+                        <h3 class="skills__title">Backend Development</h3>
+                        <ul>
+                            <li>Node.js</li>
+                            <li>Express</li>
+                            <li>Python</li>
+                            <li>Django</li>
+                            <li>Java</li>
+                        </ul>
+                    </article>
+                    <article class="skills__card">
+                        <h3 class="skills__title">Database Management</h3>
+                        <ul>
+                            <li>MySQL</li>
+                            <li>PostgreSQL</li>
+                            <li>MongoDB</li>
+                            <li>SQLite</li>
+                            <li>Redis</li>
+                        </ul>
+                    </article>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="popup" id="order-form">
+        <h3>Order Form</h3>
+        <p>Product: <span id="product-name"></span></p>
+        <p>Price: <span id="product-price"></span></p>
+        <input type="text" id="name" placeholder="Your Name" oninput="validateForm()">
+        <input type="text" id="phone" placeholder="Your Phone Number" oninput="validateForm()">
+        <input type="email" id="email" placeholder="Your Email" oninput="validateForm()">
+        <select id="country" oninput="validateForm()">
+            <option value="">Select Country</option>
+            <option value="pkr">Pakistan</option>
+            <option value="Indai">India</option>
+            <option value="BD">Bangladesh</option>
+            <option value="Other Country">Other Country</option>
+            <!-- Add more countries as needed -->
+        </select>
+        <button id="submit-button" onclick="sendOrder()" disabled>Submit</button>
+        <button class="cancel" onclick="closeOrderForm()">Cancel</button>
+    </div>
+
+    <!--=============== SCROLL UP ===============-->
+    <a href="#" class="scrollup" id="scroll-up">
+        <i class="ri-arrow-up-line"></i>
+    </a>
+
+    <!--=============== SCROLL REVEAL ===============-->
+    <script src="https://unpkg.com/scrollreveal"></script>
+
+    <!--=============== MAIN JS ===============-->
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
